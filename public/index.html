@@ -1,0 +1,140 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="/s.css">
+    </head>
+    <body>
+        <nav>
+            <ul>
+            <li><a href='/'>loserix</a></li></ul>
+        <ul>
+            <li><a href="/profile/messages"> Mesajlar</a></li>
+            <li><a href="/profile/balance"> Balance</a></li>
+            <li><a href="/profile/history"> Kayitlar</a></li>
+        </ul>
+        </nav>
+        <div class="grid-2">
+            <div>
+                <h3>How It works</h3>
+                <ol>
+                <li> there are items to select
+                <li> Items ordered from higest to lowest
+                <li> Least one wins
+            </ol>
+            <h3>Example scenario:</h3>
+            <ol>
+                <li> Red Car 5
+                <li> Blue Car 25
+                <li> Blue Car 30    
+                <li> Yellow Car 35
+            </ol>
+            If you play 5$ to Red Car and game ends, 
+                <br>total money on game = 100$
+                <br> loserix gets %5, so 95$ will be shared
+                <br>Everyone who played on Red Car gets 
+                <br> There were 5$, you added 5$, total 10$
+                Your ratio is 10/5 so you will get 44$, 
+
+            </div>
+            <div>
+                <h3>Rooms</h3>
+                <p>Servers close to your location shown:</p>
+<div class="roomsPlace"></div>
+<div>
+<div class="chatPlace"></div>
+<input onkeydown="chatMessage(event)" />
+</div>
+<div class="pingPlace"></div>
+
+            </div>
+        </div>
+    </body>
+    <form method="post" action="/signIn" target="login">
+        <input name="email" />
+        <input name="password" />
+        <input type="submit" />
+
+    </form>
+    <button onclick="wsConnect()" >Ws</button>
+    <script>
+        oldElems = {
+            message:[],
+            msgIds : [], 
+            gameStatus:[]
+        }
+        let ws = false;
+        function chatMessage(k){
+            if(k.key == 'Enter'){
+                if(ws)
+                    ws.send(JSON.stringify({type:'chat', data:k.target.value}))
+            console.log(k)}
+        }
+        function wsConnect(){
+            ws = new WebSocket("ws://"+location.host+"/play?roomid=taylar", "json")
+            ws.onmessage = (e)=>{
+                console.log(e.data)
+                let m = JSON.parse(e.data)
+                switch(m.type){
+                    case 'ping':
+                        return updatePing(m.data);
+                    case 'rooms':
+                        return updateRooms(m.data);
+                    case 'chat':
+                        return updateChat(m.data)
+                    case 'GameState':
+                        return GameStateUpdate(m.data);
+
+
+                }
+            } 
+        }
+        function GameStateUpdate(data){
+            
+        }
+        function updatePing(ping){
+            document.querySelector(".pingPlace").innerHTML = ping;
+        }
+        function updateChat(mgss){
+            document.querySelector(".chatPlace").innerHTML += mgss.map(m=>`<div>
+                <div>${m.msg}</div>
+                </div>`)
+            document.querySelector(".chatPlace >:last-child").focus()
+
+        }
+        function updateMessages(mgss){
+            document.querySelector(".chatPlace").innerHTML += mgss.filter(m=>!oldElems.msgIds.includes(m.id)).map(m=>`<div>
+                <div>${m.message}</div>
+                </div>`)
+
+        }
+        function updateRooms(rooms){
+            let elems = ''
+            rooms.forEach(room => {
+                elems +=
+                `<div class="room">
+                    <div class='row'>
+                    <div class="count">
+                    ${room.count} 
+                    </div>
+                    <div class='column'>
+                    <div class="name">
+                        <a href='${room.uri}'>
+                    ${room.name} 
+                    </a>
+                    </div>
+                    <div class="desc">
+                    ${room.desc} 
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    `
+                    document.querySelector(".roomsPlace").innerHTML = elems;
+
+                });
+        }
+    
+        fetch('/games/rooms').then(r=>r.json()).then(r=>{
+            updateRooms(r);
+        })
+    </script>
+</html>

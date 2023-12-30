@@ -1,0 +1,65 @@
+body {
+  max-width: 1400px;
+  margin: auto;
+}
+a {
+  text-decoration-line: none;
+  font-variant: all-petite-caps;
+  font-size: larger;
+}
+nav {
+  font-size: larger;
+  display: flex;
+  justify-content: space-between;
+  & ul {
+    list-style-type: none;
+    display: flex;
+    justify-content: space-evenly;
+    gap: 1em;
+
+    margin: 1em 0;
+    padding: 0;
+    & li {
+    }
+  }
+}
+.column {
+  display: flex;
+  flex-direction: column;
+}
+.row {
+  display: flex;
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.roomsPlace {
+  padding: 0.5em;
+
+  display: flex;
+  gap: 1em;
+  .room {
+    margin-bottom: 1em;
+    border: 1px solid salmon;
+    padding: 1em;
+    border-radius: 1em;
+    .count {
+      font-size: 2em;
+      display: inline-block;
+      width: 3em;
+    }
+    .name {
+      font-size: 1.2em;
+      font-weight: 600;
+    }
+    .desc {
+      font-weight: 100;
+    }
+  }
+}
+.chatPlace {
+  min-height: 100px;
+  max-height: 200px;
+  overflow-y: scroll;
+}
