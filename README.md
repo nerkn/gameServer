@@ -1,6 +1,6 @@
 # gameserver
 
-To install dependencies:
+GameServer for bidding game
 
 ```bash
 bun install

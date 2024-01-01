@@ -34,7 +34,7 @@ export const UsersTable = mysqlTable(
     email: varchar("email", { length: 255 }).notNull().unique(),
     password: varchar("password", { length: 118 }).notNull(),
     image: varchar("image", { length: 255 }),
-    activationId: varchar("activationLink", { length: 36 }),
+    activationLink: varchar("activationLink", { length: 36 }),
     resetPasswordId: varchar("resetPasswordId", { length: 36 }),
     isActivated: boolean("isActivated").default(false).notNull(),
     isBanned: boolean("isBanned").default(false).notNull(),
@@ -45,7 +45,7 @@ export const UsersTable = mysqlTable(
     return {
       emailIdx: uniqueIndex("email_idx").on(table.email),
       createdAtIdx: index("createdAt_idx").on(table.createdAt),
-      activationIdIdx: uniqueIndex("activationId_idx").on(table.activationId),
+      activationIdIdx: uniqueIndex("activationId_idx").on(table.activationLink),
     };
   }
 );
@@ -63,7 +63,6 @@ export type UserCreate = Pick<
   InferInsertModel<typeof UsersTable>,
   "name" | "email" | "password"
 >;
-
 export const UserZod = createSelectSchema(UsersTable, {
   email: (schema) => schema.email.email(),
   password: (schema) => schema.password.length(118),

@@ -4,8 +4,19 @@ import { staticPlugin } from "@elysiajs/static";
 import { auth, authentication } from "@/auth/auth.controller";
 import { games } from "@/games/games.routes";
 import { game } from "@/game/game.routes";
+import { mailjet } from "./libs/mailjet";
 const app = new Elysia()
   .use(staticPlugin({ prefix: "/" }))
+  .use(mailjet)
+  .get("/mailDene", async ({ sendJetMail }) => {
+    console.log("basliyor");
+    let r = await sendJetMail(
+      "erkintek@gmail.com",
+      "Umarim mesajim size ulasir"
+    );
+    console.log("bitiyor", r);
+    return "kedi 1234";
+  })
   .use(games)
   .use(auth)
   .use(game)
