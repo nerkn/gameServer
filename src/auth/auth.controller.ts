@@ -21,6 +21,7 @@ export const auth = new Elysia()
   .use(db)
   .group("/user", (app) =>
     app
+      .get("/AmIloggedIn", async ({ getCurrentUser }) => getCurrentUser())
       .guard(
         {
           body: t.Object({

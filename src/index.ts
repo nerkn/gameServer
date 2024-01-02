@@ -5,6 +5,7 @@ import { auth, authentication } from "@/auth/auth.controller";
 import { games } from "@/games/games.routes";
 import { game } from "@/game/game.routes";
 import { mailjet } from "./libs/mailjet";
+import { profile } from "./profile/profile";
 const app = new Elysia()
   .use(staticPlugin({ prefix: "/" }))
   .use(mailjet)
@@ -20,6 +21,7 @@ const app = new Elysia()
   .use(games)
   .use(auth)
   .use(game)
+  .use(profile)
   .use(authentication)
   .post("/sign-out", async ({ signOut }) => {
     signOut();
