@@ -7,7 +7,8 @@ import { game } from "@/game/game.routes";
 import { mailjet } from "./libs/mailjet";
 import { profile } from "./profile/profile";
 const app = new Elysia()
-  .use(staticPlugin({ prefix: "/" }))
+  .use(staticPlugin({ prefix: "/", assets: "./public/dist" }))
+  .get("/", () => Bun.file("./public/dist/index.html"))
   .use(mailjet)
   .get("/mailDene", async ({ sendJetMail }) => {
     console.log("basliyor");
