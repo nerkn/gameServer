@@ -7,4 +7,4 @@ services:
     volumes:
       - "./:/app"
     working_dir: /app
-    entrypoint: ["bun", "run", "start"]
+    entrypoint: ["start.sh"]
