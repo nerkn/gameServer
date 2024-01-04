@@ -5,6 +5,7 @@ import {
   GameOne,
   GameOneDefault,
 } from "@/games/entities/schema";
+import { PlayerPlaceBidCB, PlayerWinCB } from "./game.types";
 
 type oneBid = {
   roomId: string;
@@ -24,12 +25,8 @@ export class GameRunner {
   gameState: GameState = "brake";
   gameTimer: number = 0;
   players: PlayerDto[] = [];
-  playerWin: (p: PlayerDto, amount: number) => Promise<boolean>;
-  playerPlaceBid: (
-    p: PlayerDto,
-    item: number,
-    amount: number
-  ) => Promise<boolean>;
+  playerWin: PlayerWinCB;
+  playerPlaceBid: PlayerPlaceBidCB;
 
   constructor({
     roomId,
@@ -41,12 +38,8 @@ export class GameRunner {
     roomId: string;
     game: GameOne;
     items: GameItemOne[];
-    playerWin: (p: PlayerDto, amount: number) => Promise<boolean>;
-    playerPlaceBid: (
-      p: PlayerDto,
-      item: number,
-      amount: number
-    ) => Promise<boolean>;
+    playerWin: PlayerWinCB;
+    playerPlaceBid: PlayerPlaceBidCB;
   }) {
     this.playerWin = playerWin;
     this.playerPlaceBid = playerPlaceBid;
@@ -71,7 +64,10 @@ export class GameRunner {
     if (!this.game.active && this.gameState != "running") {
       return false;
     }
-    if (await this.playerPlaceBid(player, item, amount)) {
+    let newBalance = await this.playerPlaceBid(player, item, amount);
+    if (newBalance) {
+      player.balance = newBalance.newBalance;
+      player.updateBalance(newBalance.newBalance);
       this.bids.push({
         itemId: item,
         playerId: player.id,
@@ -124,7 +120,7 @@ export class GameRunner {
     let winner = this.itemsCumul.sort((a, b) => a.cumul - b.cumul)[0];
     if (winner.cumul) {
       let winperDolar = ((totalCash * 0.95) | 0) / winner.cumul;
-      this.players.map((player) => {
+      this.players.map(async (player) => {
         let totalWager = this.bids.reduce(
           (t, w) =>
             t +
@@ -134,13 +130,14 @@ export class GameRunner {
           0
         );
         let playerCash = (totalWager * winperDolar) | 0;
-        this.playerWin(player, playerCash);
+        let newBalance = await this.playerWin(player, playerCash);
         player.ws.send(
           JSON.stringify({
             type: "playerWin",
             data: {
               totalCash,
               playerCash,
+              newBalance: newBalance ? newBalance.newBalance : 0,
             },
           })
         );

@@ -3,6 +3,7 @@ export type PlayerDto = {
   id: string;
   balance: number;
   balanceCurrrency: string;
+  updateBalance: (newBalance: number) => void;
   ws: any;
 };
 

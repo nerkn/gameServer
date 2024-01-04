@@ -90,6 +90,12 @@ export const game = new Elysia()
           id: cu.id,
           balance: cu.balance,
           balanceCurrrency: "$",
+          updateBalance: (newBalance: number) =>
+            Players.forEach((room) => {
+              let userFound;
+              if ((userFound = room.players.find((p) => p.id == cu.id)))
+                userFound.balance = newBalance;
+            }),
           ws,
         };
         let wsRaw = ws.raw as typeof ws.raw & { user: typeof user } & {

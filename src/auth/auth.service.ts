@@ -7,8 +7,6 @@ import { db } from "@/config/db";
 import { UserCreate, UsersTable } from "./entities/user";
 import { eq } from "drizzle-orm";
 import { UserBid } from "@/game/entities/UserBid";
-import { sign } from "crypto";
-import { userInfo } from "os";
 import { mailjet } from "@/libs/mailjet";
 
 const jwtPayloadSchema = t.Object({
@@ -57,7 +55,12 @@ export const authentication = new Elysia()
       getCurrentUser: async () => {
         const payload = await jwt.verify(cookie.auth);
         if (!payload) throw new UnauthorizedError();
-        return payload;
+        let userDb = await drizzle
+          .select()
+          .from(UsersTable)
+          .where(eq(UsersTable.id, payload.id));
+        if (!userDb || !userDb.length) throw new UnauthorizedError();
+        return { ...payload, balance: userDb[0].balance ?? 0 };
       },
       async placeBid(
         user: string,
@@ -75,9 +78,10 @@ export const authentication = new Elysia()
           (userBalance[0]?.balance ?? 0) < amounth
         )
           return false;
+        let newBalance = (userBalance[0].balance ?? 0) - amounth;
         let updateRes = await drizzle
           .update(UsersTable)
-          .set({ balance: (userBalance[0].balance ?? 0) - amounth })
+          .set({ balance: newBalance })
           .where(eq(UsersTable.id, user));
         console.log("placeBid updateRes", updateRes);
         let insertRes = await drizzle.insert(UserBid).values({
@@ -87,7 +91,7 @@ export const authentication = new Elysia()
           amounth,
         });
         console.log("placebid resolutions: ", updateRes, insertRes);
-        return true;
+        return { newBalance };
       },
       signInUser: async (body: { email: string; password: string }) => {
         let dbUser = await drizzle
@@ -98,7 +102,7 @@ export const authentication = new Elysia()
           if (dbUser[0].password == body.password) {
             let data = {
               id: dbUser[0].id,
-              balance: 1000,
+              balance: dbUser[0].balance ?? 0,
               name: dbUser[0].name,
               role: "user",
             };

@@ -15,12 +15,13 @@ export const profile = new Elysia()
           let createdAt = sql`substr(${UserBid.createdAt}, 1, 12)`;
           return drizzle
             .select({
-              date: createdAt,
+              game: UserBid.game,
+              createdAt: createdAt,
               amount: sql<number>`sum(${UserBid.amounth})`.mapWith(Number),
             })
             .from(UserBid)
             .where(eq(UserBid.user, user.id))
-            .groupBy(createdAt);
+            .groupBy(createdAt, UserBid.game);
         });
       })
   );

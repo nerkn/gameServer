@@ -4,7 +4,11 @@ import { envConfig } from "@/envConfig";
 import * as schema from "./schema";
 import Elysia from "elysia";
 
-const client = mysql2.createPool(envConfig.DB_URL);
+const client = mysql2.createPool({
+  uri: envConfig.DB_URL,
+  idleTimeout: 30,
+  maxIdle: 1,
+});
 
 export const db = new Elysia({ name: "drizzle" }).decorate(
   "drizzle",
