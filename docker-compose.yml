@@ -1,0 +1,11 @@
+
+version: "3"
+services:
+   bun:
+     image: oven/bun:1.0
+     ports:
+       - "3000:3000"
+     volumes:
+      - '.:/app'
+      working_dir: /app
+     entrypoint: ["bun", "run","start"]

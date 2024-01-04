@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LoserIx Game</title>
+    <script type="module" crossorigin src="/assets/index-4OIZSUGY.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-_AvTWDTg.css">
+  </head>
+  <body>
+    <div id="app"></div>
+    <div class="mouseUnder">
+      <div class="star"> </div>
+      <div class="star"> </div>
+      <div class="star"> </div>
+      <div class="star"> </div>
+    </div>
+  </body>
+  <script>
+    function mouseHareket(){
+    let mouseUnder = document.querySelector('.mouseUnder')
+    let mouseUnderStars = document.querySelectorAll('.mouseUnder .star')
+    let counter = 0
+    let prevX, prevY = 0;
+    let prevXX, prevYY = 0;
+    document.querySelector('body').addEventListener("mousemove", e=>{
+      prevYY = e.clientY 
+      prevXX = e.clientX 
+    })
+    setInterval(()=>{
+      counter++;
+      if(counter == 60)
+        counter = 0
+      //console.log(counter, Math.cos(Math.PI* counter /30)   , Math.sin(Math.PI * counter/30 ))
+      let x = 50*Math.cos(Math.PI* counter /30) | 0;
+      let y= 50*Math.sin(Math.PI * counter/30 ) | 0
+
+      let x2 = 50*Math.cos(Math.PI* counter /30 + 15) | 0;
+      let y2= 50*Math.sin(Math.PI * counter/30  +15 ) | 0
+      mouseUnderStars[0].style.top =  -50 - y +'px'
+      mouseUnderStars[0].style.left = -50+ x +'px'
+
+      mouseUnderStars[1].style.top =  50+ y2 +'px'
+      mouseUnderStars[1].style.left = -50+ x2 +'px'
+
+      mouseUnderStars[2].style.top = -50+ y +'px'
+      mouseUnderStars[2].style.left = 50+ x +'px'
+
+      mouseUnderStars[3].style.top =  50- y2 +'px'
+      mouseUnderStars[3].style.left = 50+ x2 +'px'
+      if(prevX == prevXX)
+        return;
+      prevY = (prevYY + prevY*15 )>>4 | 0
+      prevX = (prevXX + (prevX?prevX:0)*15 )>>4 |0 
+
+      mouseUnder.style.top = prevY-50 +'px'
+      mouseUnder.style.left = prevX-50 +'px'
+    }, 200)
+  }
+
+  </script>
+  <style>
+    .mouseUnder{
+      position: absolute;
+      pointer-events: none;
+    }
+    .mouseUnder .star{
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      backdrop-filter:   saturate(5);
+    }
+    .mouseUnder :nth-child(2){
+      position: absolute;
+      left: 100px;
+      top:100px;
+    }
+  </style>
+</html>
