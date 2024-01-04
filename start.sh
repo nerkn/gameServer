@@ -1,2 +1,4 @@
-bun init
+#!sh
+bun install
+
 bun run start
