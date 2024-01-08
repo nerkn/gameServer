@@ -34,6 +34,7 @@ export const authentication = new Elysia()
         set.status = "Precondition Failed";
         return { code, message: error.message };
       default:
+        return;
         console.log("noldu acep");
         set.status = "Unauthorized";
 
